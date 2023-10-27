@@ -2,7 +2,7 @@
 #SingleInstance Force
 
 ;----------------------------------------------------------------------------
-; superclicker.ahk
+; superclicker1.ahk
 ;----------------------------------------------------------------------------
 
 CoordMode("Mouse", "Screen")
@@ -27,11 +27,11 @@ if (hasParams != 0){
 appName := "Superclicker"
 appnameLower := "superclicker"
 extension := ".exe"
-appVersion := "0.003"
+appVersion := "0.004"
 
 title := appName . " " . appVersion 
 
-configFile := appnameLower . " .ini"
+configFile := appnameLower . ".ini"
 
 xClickPos := 0
 yClickPos := 0
@@ -44,8 +44,10 @@ superclickerSpeedDecreaseHotkey := "^F11"
 superclickerModeHotkey := "!F11"
 mode := 1
 maxmode := 3
+beepoff := 0
 
 clickSpeed := iniReadSave("clickSpeed", "config", 1000)
+beepoff := iniReadSave("beepoff", "config", 0)
 
 modeDescription := ["Click on current position", "Click on first position", "Click on first position,`n`nstop if mouse moved"]
 
@@ -107,7 +109,7 @@ speedIncrease(p1 := 0){
   IniWrite(clickSpeed, configFile, "config", "clickSpeed")
   
   ; showHintColored("Speed increased, new speed is: " Format("{:0.2f}", clickSpeed) " milliseconds delay between clicks", 1000)
-  showHintColored("Speed increased, new speed is: " . clickSpeed . " milliseconds delay between clicks", 1000)
+  showHintColored("Speed increased: " . clickSpeed . " milliseconds delay between clicks", 1000)
 
   return 
 }
@@ -118,7 +120,7 @@ speedDecrease(p1 := 0){
   clickSpeed := clickSpeed + 100
   IniWrite(clickSpeed, configFile, "config", "clickSpeed")
   
-  showHintColored("Speed decreased, new speed is: " . clickSpeed . " milliseconds delay between clicks", 1000)
+  showHintColored("Speed decreased: " . clickSpeed . " milliseconds delay between clicks", 1000)
   
   return 
 }
@@ -145,16 +147,20 @@ showHintColored(s := "", n := 3000, fg := "cFFFFFF", bg := "a900ff"){
 }
 ;------------------------------- clickPosition -------------------------------
 clickPosition(){ 
-  global xClickPos, yClickPos, mode, running
+  global xClickPos, yClickPos, mode, running, beepoff
 
     if (mode = 1){
       Click
+      if (!beepoff && GetKeyState("CapsLock", "T"))
+        SoundBeep
     }
     
     if (mode = 2){
       MouseGetPos &xActuPos, &yActuPos
       Click(xClickPos, yClickPos)
       MouseMove xActuPos, yActuPos
+      if (!beepoff && GetKeyState("CapsLock", "T"))
+        SoundBeep
     }
     
     if (mode = 3){
@@ -165,6 +171,8 @@ clickPosition(){
         showHintColored("Stopped (due to mousemove)!", 2000)
       } else {
         Click(xClickPos, yClickPos)
+        if (!beepoff && GetKeyState("CapsLock", "T"))
+          SoundBeep
       }
     }
     
