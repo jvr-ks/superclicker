@@ -1,0 +1,4 @@
+superclicker.exe
+superclicker.ini
+Licenses.txt
+
