@@ -1,8 +1,30 @@
-;----------------------------------------------------------------------------
-; superclicker.ahk
-;----------------------------------------------------------------------------
+/*
+ *********************************************************************************
+ * 
+ * superclicker.ahk
+ * 
+ * 
+ * Version: no versioning
+ * 
+ * Copyright (c) 2024 jvr.de. All rights reserved.
+ *
+ *
+ *********************************************************************************
+*/
+/*
+ *********************************************************************************
+ * 
+ * GNU GENERAL PUBLIC LICENSE
+ * 
+ * A copy is included in the file "license.txt"
+ *
+  *********************************************************************************
+*/
+
 #Requires AutoHotkey v2
 #SingleInstance Force
+
+#Include Lib\codeToText.ahk
 
 #UseHook 1
 
@@ -30,7 +52,7 @@ if (hasParams != 0){
 appName := "Superclicker"
 appnameLower := "superclicker"
 extension := ".exe"
-appVersion := "0.015"
+appVersion := "0.016"
 
 title := appName . " " . appVersion 
 
@@ -78,7 +100,7 @@ showQuickHelp(*){
     s .= codeToText(superclickerModeHotkey) . " to toggle click mode,`n`n"
     s .= codeToText(superclickerSpeedIncreaseHotkey) " to increase speed,`n`n"
     s .= codeToText(superclickerSpeedDecreaseHotkey) " to decrease speed,`n`n"
-
+    s .= "Timedelay between clicks is: " format("{1:.2f}", clickSpeed/1000) ",`n`n"
     s .= "Press " codeToText("F1") " to close Quickhelp ...`n"
     
     showHintColored(s, 0)
@@ -93,7 +115,6 @@ toogleClickLoop(p1 := 0){
   global running, xClickPos, yClickPos, mode, clickSpeed
   
   Pause 0
-  clickSpeed := iniReadSave("clickSpeed", "config", 1000)
   
   if (running){
     running := 0
@@ -241,7 +262,7 @@ setHotkeys(){
 }
 ;------------------------------ timeMeasurement ------------------------------
 timeMeasurement(*){
-  global running
+  global running, clickSpeed
   local s, start, now, msg
 
   s := "Time measurement started, position mouse within 5 seconds,`n`n"
@@ -293,201 +314,10 @@ toogleModes(p1 := 0){
   
   showHintColored("Mode changed to:`n`n" modeDescription[mode] "!`n`nPress " superclickerHotkey " to start!", 2000)
 }
-;------------------------------- hotkeyToText -------------------------------
-hotkeyFirstToText(s) {
-  
-  h := subStr(s, 1, 1)
-  tail := subStr(s, 2)
-  
-  ret := hkToDescription(h) . " + " . tail
-  
-  return ret
-}
-;------------------------------ hkToDescription ------------------------------
-hkToDescription(c) {
-  s := ""
-  
-  switch c
-  {
-    case "^":
-      s := "[CTRL]"
-    case "!":
-      s := "[ALT]"
-    case "#":
-      s := "[WIN]"
-    case "+":
-      s := "[SHIFT]"
-    case ">":
-      s := "Right"
-    case "<":
-      s := "Left"
-    case "$":
-      s := "[Alt] + [Tab]"
-    default:
-      s := "[" . c . "]"
-  }
-  
-  return s
-}
-;-------------------------------- codeToText --------------------------------
-codeToText(toParse) {
-  local theTextOut
-  
-  theTextOut := ""
 
-  c := 0x00A1 ; using unused characters as "special strings" placeholders
-  toParse := RegExReplace(toParse, "i)F12",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)F11",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)F10",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)F9",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)F8",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)F7",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)F6",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)F5",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)F4",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)F3",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)F2",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)F1",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)Home",Chr(c),&rest,1,1) ; 0x00AD
-  c += 1
-  toParse := RegExReplace(toParse, "i)End",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)PgUp",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)PgDn",Chr(c),&rest,1,1) ; 0x00B0
-  c += 1
-  toParse := RegExReplace(toParse, "i)Pause",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)CapsLock",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)Up",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)Down",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)Left",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)Right",Chr(c),&rest,1,1)
-  c += 1
-  toParse := RegExReplace(toParse, "i)Pause",Chr(c),&rest,1,1) ; 0x00B7
-
-  openBracket := "["
-  closeBracket := "]"
-  
-  Loop Parse, toParse, "", "`n`r"
-  {
-    switch A_LoopField
-    {
-      case "+": 
-        theTextOut .= openBracket . "SHIFT" . closeBracket . " + "
-        
-      case "^": 
-        theTextOut .= openBracket . "CTRL" . closeBracket . " + "
-        
-      case "!": 
-        theTextOut .= openBracket . "ALT" . closeBracket . " + "
-        
-      case "#": 
-        theTextOut .= openBracket . "WIN" . closeBracket . " + "
-        
-      case " ": 
-        theTextOut .= " "
-      
-      case Chr(0x00A1): 
-        theTextOut .= openBracket . "F12" . closeBracket . " + "
-        
-      case Chr(0x00A2): 
-        theTextOut .= openBracket . "F11" . closeBracket . " + "
-        
-      case Chr(0x00A3): 
-        theTextOut .= openBracket . "F10" . closeBracket . " + "
-        
-      case Chr(0x00A4): 
-        theTextOut .= openBracket . "F9" . closeBracket . " + "
-
-      case Chr(0x00A5): 
-        theTextOut .= openBracket . "F8" . closeBracket . " + " 
-
-      case Chr(0x00A6): 
-        theTextOut .= openBracket . "F7" . closeBracket . " + " 
-
-      case Chr(0x00A7): 
-        theTextOut .= openBracket . "F6" . closeBracket . " + "        
-        
-      case Chr(0x00A8): 
-        theTextOut .= openBracket . "F5" . closeBracket . " + "    
-        
-      case Chr(0x00A9): 
-        theTextOut .= openBracket . "F4" . closeBracket . " + "  
-        
-      case Chr(0x00AA): 
-        theTextOut .= openBracket . "F3" . closeBracket . " + "        
-        
-      case Chr(0x00AB): 
-        theTextOut .= openBracket . "F2" . closeBracket . " + "        
-        
-      case Chr(0x00AC): 
-        theTextOut .= openBracket . "F1" . closeBracket . " + "
-        
-      case Chr(0x00AC): 
-        theTextOut .= openBracket . "F1" . closeBracket . " + "
-
-      case Chr(0x00AD): 
-        theTextOut .= openBracket . "Home" . closeBracket . " + "
-
-      case Chr(0x00AE): 
-        theTextOut .= openBracket . "End" . closeBracket . " + "
-
-      case Chr(0x00AF): 
-        theTextOut .= openBracket . "PgUp" . closeBracket . " + "
-
-      case Chr(0x00B0): 
-        theTextOut .= openBracket . "PgDn" . closeBracket . " + "
-
-      case Chr(0x00B1): 
-        theTextOut .= openBracket . "Pause" . closeBracket . " + "
-
-      case Chr(0x00B2): 
-        theTextOut .= openBracket . "CapsLock" . closeBracket . " + "
-
-      case Chr(0x00B3): 
-        theTextOut .= openBracket . "Up" . closeBracket . " + "
-
-      case Chr(0x00B4): 
-        theTextOut .= openBracket . "Down" . closeBracket . " + "
-
-      case Chr(0x00B5): 
-        theTextOut .= openBracket . "Left" . closeBracket . " + "
-
-      case Chr(0x00B6): 
-        theTextOut .= openBracket . "Right" . closeBracket . " + "
-        
-      case Chr(0x00B7): 
-        theTextOut .= openBracket . "Pause" . closeBracket . " + "
-
-      default:
-        theTextOut .= openBracket . "" . A_LoopField . "" . closeBracket
-    }
-  }
-  ; StringCaseSense, Off
-  if (SubStr(theTextOut, -3, 3) == " + ")
-    theTextOut := SubStr(theTextOut, 1, -3)
-  
-  return theTextOut
-}
 ;----------------------------------- Exit -----------------------------------
 exit(p1 := 0){
+  global
   
   SetTimer(clickLoop, 0)
   

@@ -54,5 +54,5 @@ Copyright (c) 2023/24 J. v. Roos
 
 
 ##### Virusscan at Virustotal 
-[Virusscan at Virustotal, superclicker.exe 64bit-exe, Check here](https://www.virustotal.com/gui/url/6f91ac280f107ef1efcde38bff16027ea752fe03a818916352ec8747b670148c/detection/u-6f91ac280f107ef1efcde38bff16027ea752fe03a818916352ec8747b670148c-1708456062
+[Virusscan at Virustotal, superclicker.exe 64bit-exe, Check here](https://www.virustotal.com/gui/url/6f91ac280f107ef1efcde38bff16027ea752fe03a818916352ec8747b670148c/detection/u-6f91ac280f107ef1efcde38bff16027ea752fe03a818916352ec8747b670148c-1708466122
 )  
