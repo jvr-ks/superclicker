@@ -4,8 +4,6 @@
  * superclicker.ahk
  * 
  * 
- * Version: no versioning
- * 
  * Copyright (c) 2024 jvr.de. All rights reserved.
  *
  *
