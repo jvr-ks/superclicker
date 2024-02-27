@@ -32,8 +32,6 @@ CoordMode("Mouse", "Screen")
 
 wrkDir := A_ScriptDir . "\"
 
-hintColored := 0
-
 ;-------------------------------- read cmdline param --------------------------------
 hasParams := A_Args.Length
 
@@ -52,7 +50,7 @@ if (hasParams != 0){
 appName := "Superclicker"
 appnameLower := "superclicker"
 extension := ".exe"
-appVersion := "0.016"
+appVersion := "0.017"
 
 title := appName . " " . appVersion 
 
@@ -75,6 +73,9 @@ quickHelpVisible := 0
 
 clickSpeed := iniReadSave("clickSpeed", "config", 1000)
 beepoff := iniReadSave("beepoff", "config", 0)
+fontsize := iniReadSave("fontsize", "config", "10")
+fontname := iniReadSave("fontname", "config", "Segoe UI")
+fontweight := iniReadSave("fontweight", "config", "400")
 
 modeDescription := ["Click on current position", "Click on first position", "Click on first position,`n`nstop if mouse moved"]
 
@@ -90,10 +91,11 @@ showQuickHelp(*){
   local s
   
   if (!A_IsPaused){
-    s := "*** SuperClicker QuickHelp " codeToText("F1") " ***`n`n"
+    s := "*** SuperClicker QuickHelp ***`n`n"
     s .= "Please press:`n`n"
-    s .= codeToText(superclickerHotkey) " or right-mouse button toggle run/stop,`n`n"
-    s .= codeToText(superclickerRemoveHotkey) " to remove SuperClicker from memory!`n`n"
+    s .= codeToText(superclickerHotkey) " (or right-mouse button) toggle run/stop,`n`n"
+    s .= "(Additional [Ctrl] enables a beep, hold down [Shiftl] to suppress clicks),`n`n"
+    s .= codeToText(superclickerRemoveHotkey) " to remove SuperClicker from memory,`n`n"
     
     s .= codeToText("F2") " to measure the time between two clicks (to set the timedelay),`n`n" 
     
@@ -101,7 +103,7 @@ showQuickHelp(*){
     s .= codeToText(superclickerSpeedIncreaseHotkey) " to increase speed,`n`n"
     s .= codeToText(superclickerSpeedDecreaseHotkey) " to decrease speed,`n`n"
     s .= "Timedelay between clicks is: " format("{1:.2f}", clickSpeed/1000) ",`n`n"
-    s .= "Press " codeToText("F1") " to close Quickhelp ...`n"
+    s .= codeToText("F1") " show/hide Quickhelp.`n"
     
     showHintColored(s, 0)
     Pause
@@ -112,9 +114,15 @@ showQuickHelp(*){
 }
 ;------------------------------ toogleClickLoop ------------------------------
 toogleClickLoop(p1 := 0){
-  global running, xClickPos, yClickPos, mode, clickSpeed
+  global running, xClickPos, yClickPos, mode, clickSpeed, beepoff
   
   Pause 0
+  
+  if (GetKeyState("Ctrl")){
+    beepoff := 0
+  } else {
+    beepoff := 1
+  }
   
   if (running){
     running := 0
@@ -166,19 +174,22 @@ speedDecrease(p1 := 0){
 }
 ;------------------------------ showHintColored ------------------------------
 showHintColored(s := "", n := 3000, fg := "cFFFFFF", bg := "a900ff"){
-  global hintColored
-  local t
+  global hintColored, fontsize, fontweight, fontname
+  local fontOption
   
-  if (hintColored != 0)
+  fontOption := "C" fg " S" fontsize " W" fontweight " Q5"
+  
+  if (IsSet(hintColored))
     hintColored.destroy
+  
   hintColored := Gui("+0x80000000")
-  hintColored.SetFont("c" . fg)
+  hintColored.SetFont(fontOption, fontname)
   hintColored.BackColor := bg
   hintColored.add("Text", , s)
   hintColored.Opt("-Caption")
   hintColored.Opt("+ToolWindow")
   hintColored.Opt("+AlwaysOnTop")
-  hintColored.Show("center")
+  hintColored.Show("center autosize")
   
   if (n > 0){
     sleep(n)
@@ -193,23 +204,23 @@ clickPosition(){
   if (mode = 1){
     if (!GetKeyState("Shift", "P") && !GetKeyState("CapsLock", "T")) {
       Click
+      if (!beepoff)
+        SoundBeep
     } else {
-      showHintColored("Clicks are supressed ...", 1000)
+      showHintColored("Click is suppressed ...", 1000)
     }
-    if (!beepoff)
-      SoundBeep
   }
   
   if (mode = 2){
     MouseGetPos &xActuPos, &yActuPos
     if (!GetKeyState("Shift", "P")) {
       Click(xClickPos, yClickPos)
+      if (!beepoff)
+        SoundBeep
     } else {
-      showHintColored("Clicks are supressed ...", 1000)
+      showHintColored("Click is suppressed ...", 1000)
     }
     MouseMove xActuPos, yActuPos
-    if (!beepoff)
-      SoundBeep
   }
   
   if (mode = 3){
@@ -221,11 +232,11 @@ clickPosition(){
     } else {
       if (!GetKeyState("Shift", "P")) {
         Click(xClickPos, yClickPos)
-      } else {
-        showHintColored("Clicks are supressed ...", 1000)
-      }
       if (!beepoff)
         SoundBeep
+      } else {
+        showHintColored("Click is suppressed ...", 1000)
+      }
     }
   }
 }
@@ -249,14 +260,14 @@ setHotkeys(){
   global superclickerModeHotkey
 
   Hotkey("F1", showQuickHelp, "On T2")
-  Hotkey(superclickerHotkey, toogleClickLoop, "On T1")
+  Hotkey("*" superclickerHotkey, toogleClickLoop, "On T1")
   Hotkey(superclickerRemoveHotkey, exit, "On T1")
   Hotkey(superclickerModeHotkey, toogleModes, "On T1")
   
   Hotkey(superclickerSpeedIncreaseHotkey, speedIncrease, "On T1")
   Hotkey(superclickerSpeedDecreaseHotkey, speedDecrease, "On T1")
   
-  Hotkey("RBUTTON", toogleClickLoop, "On T1")
+  Hotkey("*RBUTTON", toogleClickLoop, "On T1")
   
   Hotkey("F2", timeMeasurement, "On T1")
 }
